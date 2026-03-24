@@ -110,7 +110,6 @@ p, label, span {
   position: relative;
 }
 
-/* Mood-aware page container */
 .page-container {
   flex: 1;
   padding: var(--space-3);
@@ -124,6 +123,39 @@ p, label, span {
 .page-container--anxiety  { background-color: var(--mood-anxiety); }
 .page-container--anger    { background-color: var(--mood-anger); }
 .page-container--default  { background-color: var(--color-bg); }
+
+/* ============================================================
+   APP HEADER (Sentient branding)
+   ============================================================ */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  height: 52px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+}
+
+.app-header__icon {
+  display: flex;
+  align-items: center;
+  color: var(--color-btn-primary-text);
+}
+
+.app-header__wordmark {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+}
 
 /* ============================================================
    BOTTOM NAVIGATION
@@ -463,6 +495,92 @@ p, label, span {
   height: 100%;
   border-radius: 999px;
   transition: width 1s ease;
+}
+
+/* ============================================================
+   HISTORY ENTRY CARD
+   ============================================================ */
+
+.history-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.history-entry__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-1);
+}
+
+.history-entry__date {
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.history-entry__text {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  line-height: 1.65;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.history-entry__delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-hint);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  transition: var(--transition-ui);
+  flex-shrink: 0;
+}
+
+.history-entry__delete:hover {
+  color: #C53030;
+  background: rgba(197, 48, 48, 0.06);
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: var(--space-5) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.empty-state__icon {
+  color: var(--color-text-hint);
+  opacity: 0.6;
+}
+
+.empty-state__title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.empty-state__text {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--color-text-hint);
+  line-height: 1.6;
+  max-width: 240px;
 }
 
 /* ============================================================

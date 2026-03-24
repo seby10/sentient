@@ -11,21 +11,21 @@ export const MOOD_CONFIGS: Record<MoodType, MoodConfig> = {
   neutral: {
     label: 'Calma',
     color: '#E6F4EA',
-    keywords: ['calm', 'peaceful', 'okay', 'fine', 'good', 'tired', 'exhausted', 'sleepy'],
+    keywords: ['calma', 'tranquilo', 'bien', 'cansado', 'agotado', 'dormido'],
   },
   sadness: {
     label: 'Melancolía',
     color: '#EBF4FA',
-    keywords: ['sad', 'lonely', 'empty', 'down', 'lost', 'hopeless', 'cry', 'miss', 'grief', 'depressed'],
+    keywords: ['triste', 'solitario', 'vacío', 'abajo', 'perdido', 'sin esperanza', 'llorar', 'extrañar', 'dolor', 'deprimido'],
   },
   anxiety: {
     label: 'Ansioso',
     color: '#FFF8E1',
-    keywords: ['anxious', 'anxiety', 'worried', 'worry', 'stressed', 'stress', 'nervous', 'panic', 'overwhelmed', 'fear', 'scared'],
+    keywords: ['ansioso', 'ansiedad', 'preocupado', 'preocupación', 'estresado', 'estrés', 'nervioso', 'pánico', 'abrumado', 'miedo', 'asustado'],
   },
   anger: {
     label: 'Frustrado',
     color: '#FFECE8',
-    keywords: ['angry', 'anger', 'frustrated', 'frustration', 'mad', 'furious', 'annoyed', 'rage', 'irritated'],
+    keywords: ['enojado', 'enojo', 'frustrado', 'frustración', 'enojado', 'furioso', 'molesto', 'rabia', 'irritado'],
   },
 };

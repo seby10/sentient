@@ -3,25 +3,42 @@
 import { useState, useCallback } from 'react';
 import ExpandingTextInput from '@/presentation/components/ExpandingTextInput';
 import { PrimaryButton, GhostButton } from '@/presentation/components/Buttons';
+import SoftCard from '@/presentation/components/SoftCard';
 import { detectMoodFromText } from '@/domain/usecases/DetectMoodFromText';
 import { MOOD_CONFIGS, MoodType } from '@/domain/entities/MoodType';
 import { MoodIcon } from '@/presentation/icons/MoodIcon';
+import { useJournalStore } from '@/presentation/hooks/useJournalStore';
 import { Save, RotateCcw, CheckCircle2 } from 'lucide-react';
+
+function wordCount(text: string): number {
+  return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+}
 
 export default function JournalPage() {
   const [text, setText] = useState('');
   const [saved, setSaved] = useState(false);
   const [savedMood, setSavedMood] = useState<MoodType>('neutral');
+  const { entries, saveEntry } = useJournalStore();
 
   const { mood, detectedKeywords } = detectMoodFromText(text);
   const moodConfig = MOOD_CONFIGS[mood];
 
   const handleSave = useCallback(() => {
     if (!text.trim()) return;
+    saveEntry({
+      id: crypto.randomUUID(),
+      text: text.trim(),
+      mood,
+      detectedKeywords,
+      createdAt: new Date(),
+    });
     setSavedMood(mood);
     setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
-  }, [text, mood]);
+    setTimeout(() => {
+      setSaved(false);
+      setText('');
+    }, 2000);
+  }, [text, mood, detectedKeywords, saveEntry]);
 
   const handleClear = useCallback(() => {
     setText('');
@@ -31,8 +48,10 @@ export default function JournalPage() {
   const today = new Date().toLocaleDateString('es-ES', {
     weekday: 'long', month: 'long', day: 'numeric',
   });
-  // Capitalise first letter
   const dateLabel = today.charAt(0).toUpperCase() + today.slice(1);
+
+  // Recent 3 entries for quick preview
+  const recentEntries = entries.slice(0, 3);
 
   return (
     <div className={`page-container page-container--${mood}`}>
@@ -46,30 +65,26 @@ export default function JournalPage() {
 
       {/* Indicador de estado emocional */}
       <div className="animate-fade-in animate-fade-in-delay-1" style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-2)', minHeight: 32 }}>
-        {text.trim().length > 0 && (
+        {text.trim().length > 0 ? (
           <>
             <span style={{ display: 'flex', alignItems: 'center', color: 'var(--color-text-secondary)' }}>
               <MoodIcon mood={mood} size={17} />
             </span>
-            <span
-              className={`mood-badge mood-badge--${mood}`}
-              style={{ transition: 'all 0.4s ease' }}
-            >
+            <span className={`mood-badge mood-badge--${mood}`} style={{ transition: 'all 0.4s ease' }}>
               {moodConfig.label}
             </span>
             {detectedKeywords.length > 0 && (
               <span className="text-xs text-secondary">detectado: {detectedKeywords.slice(0, 3).join(', ')}</span>
             )}
           </>
-        )}
-        {text.trim().length === 0 && (
+        ) : (
           <span className="text-xs text-secondary" style={{ fontStyle: 'italic' }}>
             Comienza a escribir para ver cómo te sientes…
           </span>
         )}
       </div>
 
-      {/* Área de texto del diario */}
+      {/* Área de texto */}
       <div className="animate-fade-in animate-fade-in-delay-2">
         <label htmlFor="journal-input" className="text-xs text-secondary" style={{ display: 'block', marginBottom: 8, fontFamily: 'var(--font-heading)', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
           Tu entrada del diario
@@ -80,9 +95,10 @@ export default function JournalPage() {
           placeholder="Escribe cómo te sientes…"
           aria-label="Texto del diario"
         />
-        <p className="text-xs text-secondary" style={{ textAlign: 'right', marginTop: 6 }}>
-          {text.length} caracteres
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+          <span className="text-xs text-secondary">{wordCount(text)} {wordCount(text) === 1 ? 'palabra' : 'palabras'}</span>
+          <span className="text-xs text-secondary">{text.length} caracteres</span>
+        </div>
       </div>
 
       {/* Confirmación de guardado */}
@@ -128,11 +144,35 @@ export default function JournalPage() {
         )}
       </div>
 
+      {/* Entradas recientes */}
+      {recentEntries.length > 0 && (
+        <div className="mt-3 animate-fade-in animate-fade-in-delay-3">
+          <p className="text-xs text-secondary" style={{ fontFamily: 'var(--font-heading)', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 'var(--space-1)' }}>
+            Últimas entradas
+          </p>
+          <div className="stack">
+            {recentEntries.map(entry => (
+              <SoftCard key={entry.id} size="sm">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <span className={`mood-badge mood-badge--${entry.mood}`} style={{ fontSize: '0.7rem', padding: '2px 8px', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    <MoodIcon mood={entry.mood} size={10} strokeWidth={2} />
+                    {MOOD_CONFIGS[entry.mood].label}
+                  </span>
+                  <span className="text-xs text-secondary">
+                    {new Date(entry.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
+                  </span>
+                </div>
+                <p style={{ fontFamily: 'var(--font-body)', fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                  {entry.text}
+                </p>
+              </SoftCard>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Texto de apoyo */}
-      <p
-        className="text-sm text-secondary"
-        style={{ textAlign: 'center', marginTop: 'var(--space-3)', fontStyle: 'italic', lineHeight: 1.6 }}
-      >
+      <p className="text-sm text-secondary" style={{ textAlign: 'center', marginTop: 'var(--space-3)', fontStyle: 'italic', lineHeight: 1.6 }}>
         Tus pensamientos son privados. Escribir puede ayudarte a entender tus emociones.
       </p>
     </div>

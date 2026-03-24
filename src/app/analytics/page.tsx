@@ -1,15 +1,19 @@
+'use client';
+
 import SoftCard from '@/presentation/components/SoftCard';
-import { MockAnalyticsRepository } from '@/data/repositories/MockAnalyticsRepository';
 import { MOOD_CONFIGS, MoodType } from '@/domain/entities/MoodType';
 import { MoodIcon } from '@/presentation/icons/MoodIcon';
 import { MessageCircle, HandHeart } from 'lucide-react';
 import Link from 'next/link';
+import { useJournalStore } from '@/presentation/hooks/useJournalStore';
+import { computeAnalyticsFromEntries } from '@/domain/usecases/ComputeAnalyticsFromEntries';
+import { MockAnalyticsRepository } from '@/data/repositories/MockAnalyticsRepository';
 
 const MOOD_COLORS: Record<MoodType, string> = {
-  neutral:  '#52B788',
-  sadness:  '#5B9ABF',
-  anxiety:  '#D4A017',
-  anger:    '#D4785A',
+  neutral: '#52B788',
+  sadness: '#5B9ABF',
+  anxiety: '#D4A017',
+  anger:   '#D4785A',
 };
 
 const DAY_LABELS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
@@ -65,15 +69,25 @@ function DonutChart({ distribution }: { distribution: { mood: MoodType; percenta
 }
 
 export default function AnalyticsPage() {
-  const repo = new MockAnalyticsRepository();
-  const trend = repo.getEmotionalTrend();
+  const { entries } = useJournalStore();
+
+  // Use real data when entries exist, fall back to mock for demo
+  const trend = entries.length > 0
+    ? computeAnalyticsFromEntries(entries)
+    : new MockAnalyticsRepository().getEmotionalTrend();
+
+  const usingRealData = entries.length > 0;
 
   return (
     <div className="page-container page-container--default">
       {/* Encabezado */}
       <div className="section-header animate-fade-in">
         <h1 className="section-title">Tu semana de un vistazo</h1>
-        <p className="section-subtitle">Una mirada suave a tus patrones emocionales.</p>
+        <p className="section-subtitle">
+          {usingRealData
+            ? `Basado en ${entries.length} entrada${entries.length !== 1 ? 's' : ''} guardada${entries.length !== 1 ? 's' : ''}.`
+            : 'Una mirada suave a tus patrones emocionales.'}
+        </p>
       </div>
 
       {/* Calendario de estados */}
@@ -84,7 +98,8 @@ export default function AnalyticsPage() {
         <div className="mood-calendar">
           {trend.weekMoods.map((day, i) => {
             const date = new Date(day.date + 'T00:00:00');
-            const isToday = day.date === '2026-03-20';
+            const todayStr = new Date().toISOString().split('T')[0];
+            const isToday = day.date === todayStr;
             const config = MOOD_CONFIGS[day.mood];
             return (
               <div key={day.date}>
@@ -103,7 +118,7 @@ export default function AnalyticsPage() {
         </div>
       </SoftCard>
 
-      {/* Distribución de estados */}
+      {/* Distribución emocional */}
       <SoftCard className="mt-2 animate-fade-in animate-fade-in-delay-2">
         <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>
           Distribución emocional
@@ -128,10 +143,7 @@ export default function AnalyticsPage() {
           {trend.distribution.filter(d => d.percentage > 0).map(d => (
             <div key={d.mood}>
               <div className="legend__bar-track">
-                <div
-                  className="legend__bar-fill"
-                  style={{ width: `${d.percentage}%`, background: MOOD_COLORS[d.mood] }}
-                />
+                <div className="legend__bar-fill" style={{ width: `${d.percentage}%`, background: MOOD_COLORS[d.mood] }} />
               </div>
             </div>
           ))}
@@ -139,16 +151,18 @@ export default function AnalyticsPage() {
       </SoftCard>
 
       {/* Palabras más usadas */}
-      <SoftCard className="mt-2 animate-fade-in animate-fade-in-delay-2">
-        <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-2)' }}>
-          Palabras que más has usado
-        </h2>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {trend.topKeywords.map(kw => (
-            <span key={kw} className="keyword-chip">{kw}</span>
-          ))}
-        </div>
-      </SoftCard>
+      {trend.topKeywords.length > 0 && (
+        <SoftCard className="mt-2 animate-fade-in animate-fade-in-delay-2">
+          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-2)' }}>
+            Palabras que más has usado
+          </h2>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {trend.topKeywords.map(kw => (
+              <span key={kw} className="keyword-chip">{kw}</span>
+            ))}
+          </div>
+        </SoftCard>
+      )}
 
       {/* Tarjeta CTA */}
       <SoftCard

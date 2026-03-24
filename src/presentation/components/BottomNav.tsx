@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookHeart, BarChart3, HeartHandshake } from 'lucide-react';
+import { BookHeart, BarChart3, HeartHandshake, Clock } from 'lucide-react';
 import { type LucideIcon } from 'lucide-react';
 
 interface NavItem {
@@ -12,9 +12,10 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/',          label: 'Diario',    Icon: BookHeart      },
-  { href: '/analytics', label: 'Mi Estado', Icon: BarChart3      },
-  { href: '/dashboard', label: 'Apoyo',     Icon: HeartHandshake },
+  { href: '/',           label: 'Diario',    Icon: BookHeart      },
+  { href: '/analytics',  label: 'Mi Estado', Icon: BarChart3      },
+  { href: '/historial',  label: 'Historial', Icon: Clock          },
+  { href: '/dashboard',  label: 'Apoyo',     Icon: HeartHandshake },
 ];
 
 export default function BottomNav() {

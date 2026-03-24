@@ -154,8 +154,8 @@ export default function DashboardPage() {
         className="text-sm text-secondary"
         style={{ textAlign: 'center', marginTop: 'var(--space-4)', fontStyle: 'italic', lineHeight: 1.6, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
       >
-        <ShieldCheck size={14} strokeWidth={1.8} />
-        Todas las interacciones son completamente anónimas. Las identidades nunca se revelan.
+        <ShieldCheck size={14} strokeWidth={1.8} style={{ color: 'var(--color-btn-primary-text)' }} />
+        Todas las interacciones son completamente anónimas.
       </p>
     </div>
   );

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import BottomNav from '@/presentation/components/BottomNav';
+import AppHeader from '@/presentation/components/AppHeader';
 
 export const metadata: Metadata = {
   title: 'Sentient — Comunidad de Salud Mental',
@@ -21,11 +22,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es">
       <body>
         <div className="app-shell">
-          <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            {children}
-          </main>
-          <BottomNav />
-        </div>
+            <AppHeader />
+            <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              {children}
+            </main>
+            <BottomNav />
+          </div>
       </body>
     </html>
   );
